@@ -1,18 +1,26 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, {useEffect, useState} from 'react';
-import {View, Text, TouchableOpacity, ScrollView} from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  ScrollView,
+  Alert,
+  TextInput,
+} from 'react-native';
 import RtcEngine, {
+  DataStreamConfig,
   RtcLocalView,
   RtcRemoteView,
   VideoRenderMode,
 } from 'react-native-agora';
+import {ChatInput} from '../components/Input';
 import {requestCameraAndAudioPermission} from '../utils/permissions';
 import {styles} from './styles';
 export const Home: React.FC = () => {
   const [peerIds, setPeerIds] = useState([] as number[]);
   const [isJoinSuceed, setIsJoinSuceed] = useState(false);
   const [engine, setEngine] = useState({} as RtcEngine);
-
   const appId = 'e5c64fc6afda478996fc412a4b61aed5';
   const token =
     '006e5c64fc6afda478996fc412a4b61aed5IABY/m5mud609vVLc/gmW2zdrdYaHTMRJIXVh6jVyRJ4swx+f9gAAAAAEAACwxdSCnKOYQEAAQAKco5h';
@@ -22,7 +30,6 @@ export const Home: React.FC = () => {
     const newEngine = await RtcEngine.create(appId);
     setEngine(newEngine);
     await newEngine.enableVideo();
-
     newEngine.addListener('UserJoined', (userId, elapsed) => {
       console.log('UserJoined', userId, elapsed);
 
@@ -41,6 +48,20 @@ export const Home: React.FC = () => {
       console.log('JoinChannelSuccess', channel, userId, elapsed);
 
       setIsJoinSuceed(true);
+    });
+
+    newEngine.addListener('StreamMessage', (userId, streamId, data) => {
+      console.log('StreamMessage', userId, streamId, data);
+      Alert.alert(
+        `Receive from userId:${userId}`,
+        `streamId ${streamId}${data}`,
+        [
+          {
+            text: 'Ok',
+            onPress: () => {},
+          },
+        ],
+      );
     });
   };
 
@@ -75,6 +96,14 @@ export const Home: React.FC = () => {
     );
   };
 
+  const onPressSend = async (message: string) => {
+    const streamId = await engine.createDataStreamWithConfig(
+      new DataStreamConfig(true, true),
+    );
+
+    await engine.sendStreamMessage(streamId!, message);
+  };
+
   const renderVideos = () => {
     if (isJoinSuceed) {
       return (
@@ -84,6 +113,7 @@ export const Home: React.FC = () => {
             channelId={channelName}
             renderMode={VideoRenderMode.Hidden}
           />
+          <ChatInput onButtonPress={onPressSend} />
           {renderRemoteVideos()}
         </View>
       );
@@ -93,7 +123,7 @@ export const Home: React.FC = () => {
   };
 
   useEffect(() => {
-    // requestCameraAndAudioPermission();
+    requestCameraAndAudioPermission();
     initializeAgora();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

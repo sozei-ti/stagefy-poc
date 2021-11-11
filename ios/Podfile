@@ -12,6 +12,8 @@ target 'agora' do
     :hermes_enabled => false
   )
 
+  pod 'react-native-agora', :path => '../node_modules/react-native-agora'
+
   target 'agoraTests' do
     inherit! :complete
     # Pods for testing
