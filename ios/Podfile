@@ -14,6 +14,8 @@ target 'agora' do
 
   pod 'react-native-agora', :path => '../node_modules/react-native-agora'
 
+  pod 'BVLinearGradient', :path => '../node_modules/react-native-linear-gradient'
+
   target 'agoraTests' do
     inherit! :complete
     # Pods for testing

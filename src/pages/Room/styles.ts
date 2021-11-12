@@ -6,15 +6,8 @@ const dimensions = {
 };
 
 export const styles = StyleSheet.create({
-  max: {
+  frame: {
     flex: 1,
-  },
-  buttonHolder: {
-    height: 100,
-    alignItems: 'center',
-    flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'space-evenly',
   },
   button: {
     paddingHorizontal: 20,
@@ -22,14 +15,13 @@ export const styles = StyleSheet.create({
     backgroundColor: '#0093E9',
     borderRadius: 25,
   },
-  buttonText: {
-    color: '#fff',
-  },
   fullView: {
+    flex: 1,
     width: dimensions.width,
     height: dimensions.height - 100,
   },
   remoteContainer: {
+    paddingHorizontal: 2.5,
     width: '100%',
     height: 150,
     position: 'absolute',
