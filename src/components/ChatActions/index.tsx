@@ -3,11 +3,19 @@ import {Image, TextInput, TouchableOpacity, View} from 'react-native';
 import {styles} from './styles';
 import IoniconIcon from 'react-native-vector-icons/Ionicons';
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
+import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
+
 import giftImg from '../../assets/images/gift.png';
 import {useStream} from '../../context/stream';
 
 export const ChatActions: React.FC = () => {
-  const {sendTextMessage, toggleMicrophone, isMicrophoneOpen} = useStream();
+  const {
+    sendTextMessage,
+    toggleMicrophone,
+    isMicrophoneOpen,
+    toggleBroadcaster,
+    isBroadcaster,
+  } = useStream();
 
   const [text, setText] = useState('');
 
@@ -41,10 +49,16 @@ export const ChatActions: React.FC = () => {
           <FontAwesomeIcon name="microphone-slash" color="#FFF" size={22} />
         )}
       </TouchableOpacity>
-      <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-        <FontAwesomeIcon name="video-camera" color="#FFF" size={22} />
+      <TouchableOpacity style={styles.button} onPress={toggleBroadcaster}>
+        {isBroadcaster ? (
+          <MaterialCommunityIcon name="camera" color="#FFF" size={22} />
+        ) : (
+          <MaterialCommunityIcon name="camera-off" color="#FFF" size={22} />
+        )}
       </TouchableOpacity>
-      <TouchableOpacity style={styles.button} onPress={handleSubmit}>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => console.log('not implemented')}>
         <Image source={giftImg} style={styles.giftImage} />
       </TouchableOpacity>
     </View>

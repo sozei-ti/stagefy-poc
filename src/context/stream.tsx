@@ -1,5 +1,9 @@
 import React, {createContext, useEffect, useState} from 'react';
-import RtcEngine, {DataStreamConfig} from 'react-native-agora';
+import RtcEngine, {
+  ChannelProfile,
+  ClientRole,
+  DataStreamConfig,
+} from 'react-native-agora';
 import {MessageData, MessageType} from '../pages/models/message';
 import {requestCameraAndAudioPermission} from '../pages/utils/permissions';
 
@@ -16,6 +20,8 @@ type StreamContextProps = {
   sendTextMessage: (message: string) => void;
   toggleMicrophone: () => void;
   isMicrophoneOpen: boolean;
+  toggleBroadcaster: () => void;
+  isBroadcaster: boolean;
 };
 
 export const StreamContext = createContext<StreamContextProps>(
@@ -28,6 +34,8 @@ export const StreamProvider: React.FC = ({children}) => {
   const [engine, setEngine] = useState({} as RtcEngine);
   const [isJoinSucceed, setIsJoinSucceed] = useState(false);
   const [isMicrophoneOpen, setIsMicrophoneOpen] = useState(true);
+  const [isBroadcaster, setIsBroadcaster] = useState(false);
+
   const appId = 'e5c64fc6afda478996fc412a4b61aed5';
   const token =
     '006e5c64fc6afda478996fc412a4b61aed5IAA4PW0w31eaRjYYi1Q72PL6yvUXRg3IT/tO8CvCHprdzjkNSM8AAAAAEAACwxdSnfmPYQEAAQCc+Y9h';
@@ -38,6 +46,9 @@ export const StreamProvider: React.FC = ({children}) => {
     setEngine(newEngine);
     await newEngine.enableVideo();
     await newEngine.enableAudio();
+    await newEngine.setChannelProfile(ChannelProfile.LiveBroadcasting);
+    await newEngine.setClientRole(ClientRole.Broadcaster);
+    await newEngine.setCameraAutoFocusFaceModeEnabled(true);
     await setupListeners(newEngine);
   };
 
@@ -68,6 +79,22 @@ export const StreamProvider: React.FC = ({children}) => {
     });
   };
 
+  const toggleBroadcaster = async () => {
+    console.log('isBroadcaster', isBroadcaster);
+
+    if (isBroadcaster) {
+      await engine.enableVideo();
+    } else {
+      await engine.disableVideo();
+    }
+
+    await engine.setClientRole(
+      isBroadcaster ? ClientRole.Audience : ClientRole.Broadcaster,
+    );
+
+    setIsBroadcaster(state => !state);
+  };
+
   const registerMessage = (message: string) => {
     const messageData = JSON.parse(message) as MessageData;
 
@@ -96,6 +123,8 @@ export const StreamProvider: React.FC = ({children}) => {
       new DataStreamConfig(true, true),
     );
 
+    console.log(streamId);
+
     await engine.sendStreamMessage(streamId!, messageDate);
   };
 
@@ -106,7 +135,11 @@ export const StreamProvider: React.FC = ({children}) => {
   };
 
   const startCall = async () => {
-    await engine.joinChannel(token, channelName, null, 0);
+    await engine.joinChannelWithUserAccount(
+      token,
+      channelName,
+      `${Math.floor(Math.random() * 100)}${Date.now()}`,
+    );
   };
 
   const toggleCamera = async () => {
@@ -122,6 +155,9 @@ export const StreamProvider: React.FC = ({children}) => {
   useEffect(() => {
     requestCameraAndAudioPermission();
     initializeAgora();
+    return () => {
+      engine.destroy();
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -140,6 +176,8 @@ export const StreamProvider: React.FC = ({children}) => {
         sendTextMessage,
         isMicrophoneOpen,
         toggleMicrophone,
+        toggleBroadcaster,
+        isBroadcaster,
       }}>
       {children}
     </StreamContext.Provider>
