@@ -1,11 +1,11 @@
-import React, {createContext, useEffect, useState} from 'react';
+import React, { createContext, useEffect, useState } from 'react';
 import RtcEngine, {
   ChannelProfile,
   ClientRole,
   DataStreamConfig,
 } from 'react-native-agora';
-import {MessageData, MessageType} from '../pages/models/message';
-import {requestCameraAndAudioPermission} from '../pages/utils/permissions';
+import { MessageData, MessageType } from '../pages/models/message';
+import { requestCameraAndAudioPermission } from '../pages/utils/permissions';
 
 type StreamContextProps = {
   isJoinSucceed: boolean;
@@ -28,7 +28,7 @@ export const StreamContext = createContext<StreamContextProps>(
   {} as StreamContextProps,
 );
 
-export const StreamProvider: React.FC = ({children}) => {
+export const StreamProvider: React.FC = ({ children }) => {
   const [messages, setMessages] = useState([] as MessageData[]);
   const [peerIds, setPeerIds] = useState([] as number[]);
   const [engine, setEngine] = useState({} as RtcEngine);
@@ -178,7 +178,8 @@ export const StreamProvider: React.FC = ({children}) => {
         toggleMicrophone,
         toggleBroadcaster,
         isBroadcaster,
-      }}>
+      }}
+    >
       {children}
     </StreamContext.Provider>
   );

@@ -1,12 +1,13 @@
-import React, {useEffect, useState} from 'react';
-import {View, TouchableOpacity, Image, FlatList} from 'react-native';
-import {styles} from './styles';
+import React, { useEffect, useState } from 'react';
+import { View, TouchableOpacity, Image, FlatList } from 'react-native';
+import { styles } from './styles';
 import roomBackground from '../../assets/images/room.png';
-import {Room} from '../Room';
-import {useStream} from '../../context/stream';
+import { Room } from '../Room';
+import { useStream } from '../../context/stream';
+
 export const Home: React.FC = () => {
   const [redirectToRoom, setRedirectToRoom] = useState(false);
-  const {isJoinSucceed} = useStream();
+  const { isJoinSucceed } = useStream();
 
   useEffect(() => {
     if (!isJoinSucceed) {
@@ -29,7 +30,8 @@ export const Home: React.FC = () => {
             renderItem={() => (
               <TouchableOpacity
                 onPress={() => setRedirectToRoom(true)}
-                style={styles.button}>
+                style={styles.button}
+              >
                 <Image source={roomBackground} />
               </TouchableOpacity>
             )}

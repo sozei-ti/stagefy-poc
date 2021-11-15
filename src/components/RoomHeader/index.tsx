@@ -1,13 +1,13 @@
 import React from 'react';
-import {TouchableOpacity} from 'react-native';
-import {styles} from './styles';
+import { TouchableOpacity } from 'react-native';
+import { styles } from './styles';
 import AntDesignIcon from 'react-native-vector-icons/AntDesign';
 import MaterialIconsIcon from 'react-native-vector-icons/MaterialIcons';
 
-import {useStream} from '../../context/stream';
+import { useStream } from '../../context/stream';
 
 export const RoomHeader: React.FC = () => {
-  const {endCall, toggleCamera} = useStream();
+  const { endCall, toggleCamera } = useStream();
 
   return (
     <>

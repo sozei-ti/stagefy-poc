@@ -1,12 +1,12 @@
 import React from 'react';
-import {View, FlatList} from 'react-native';
-import {useStream} from '../../context/stream';
-import {CartItem} from '../CardItem';
-import {ChatActions} from '../ChatActions';
-import {styles} from './styles';
+import { View, FlatList } from 'react-native';
+import { useStream } from '../../context/stream';
+import { CartItem } from '../CardItem';
+import { ChatActions } from '../ChatActions';
+import { styles } from './styles';
 
 export const Chat: React.FC = () => {
-  const {messages} = useStream();
+  const { messages } = useStream();
 
   return (
     <View style={styles.container}>
@@ -15,7 +15,7 @@ export const Chat: React.FC = () => {
           data={messages}
           showsVerticalScrollIndicator={false}
           keyExtractor={item => item.id}
-          renderItem={({item}) => (
+          renderItem={({ item }) => (
             <CartItem message={item.message} user={item.user} />
           )}
         />

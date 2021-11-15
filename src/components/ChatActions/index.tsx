@@ -1,12 +1,12 @@
-import React, {useState} from 'react';
-import {Image, TextInput, TouchableOpacity, View} from 'react-native';
-import {styles} from './styles';
+import React, { useState } from 'react';
+import { Image, TextInput, TouchableOpacity, View } from 'react-native';
+import { styles } from './styles';
 import IoniconIcon from 'react-native-vector-icons/Ionicons';
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import giftImg from '../../assets/images/gift.png';
-import {useStream} from '../../context/stream';
+import { useStream } from '../../context/stream';
 
 export const ChatActions: React.FC = () => {
   const {
@@ -58,7 +58,8 @@ export const ChatActions: React.FC = () => {
       </TouchableOpacity>
       <TouchableOpacity
         style={styles.button}
-        onPress={() => console.log('not implemented')}>
+        onPress={() => console.log('not implemented')}
+      >
         <Image source={giftImg} style={styles.giftImage} />
       </TouchableOpacity>
     </View>
