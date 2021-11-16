@@ -124,7 +124,7 @@ export const StreamProvider: React.FC = ({ children }) => {
   const createMessage = (message: string): string => {
     const newMessage: MessageData = {
       id: `${Math.floor(Math.random() * 100)}${Date.now()}`,
-      message: message,
+      message,
       type: MessageType.TextMessage,
       user: {
         name: username,
