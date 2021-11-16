@@ -12,7 +12,7 @@ import ChatRoom from './pages/ChatRoom';
 export type RootStackPagesList = {
   Home: undefined;
   ChatRoom: {
-    userName: string;
+    username: string;
   };
 };
 

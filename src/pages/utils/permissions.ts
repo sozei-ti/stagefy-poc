@@ -18,6 +18,6 @@ export const requestCameraAndAudioPermission = async () => {
       console.log('Permission denied');
     }
   } catch (err) {
-    console.log(err);
+    console.log('requestCameraAndAudioPermission', err);
   }
 };

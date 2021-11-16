@@ -1,45 +1,69 @@
+import { RouteProp, useRoute } from '@react-navigation/native';
 import React, { useEffect } from 'react';
-import { ScrollView, View } from 'react-native';
+import { ActivityIndicator, ScrollView, View, Text } from 'react-native';
 import {
   RtcLocalView,
   RtcRemoteView,
   VideoRenderMode,
 } from 'react-native-agora';
+import { RootStackPagesList, useRootStackNavigation } from '../../app.routes';
 import { Chat } from '../../components/Chat';
 import { RoomHeader } from '../../components/RoomHeader';
 import { useStream } from '../../context/stream';
 import { styles } from './styles';
 
 const ChatRoom: React.FC = () => {
-  const { channelName, peerIds, startCall } = useStream();
+  const navigation = useRootStackNavigation();
+  const route = useRoute<RouteProp<RootStackPagesList, 'ChatRoom'>>();
+  const username = route.params.username;
+
+  const { streamEngine, channelName, peerIds, startCall, endCall } =
+    useStream();
 
   useEffect(() => {
-    startCall();
-  }, [startCall]);
+    if (username.length > 0) {
+      startCall(username);
+    }
+  }, [username, startCall]);
+
+  useEffect(
+    () =>
+      navigation.addListener('beforeRemove', () => {
+        endCall();
+      }),
+    [navigation, endCall],
+  );
 
   return (
     <View style={styles.fullView}>
-      <RtcLocalView.SurfaceView
-        style={styles.frame}
-        channelId={channelName}
-        renderMode={VideoRenderMode.Hidden}
-      />
-      <ScrollView style={styles.remoteContainer} horizontal={true}>
-        {peerIds.map(value => {
-          return (
-            <RtcRemoteView.SurfaceView
-              key={`${channelName}${value}`}
-              style={styles.remote}
-              uid={value}
-              channelId={channelName}
-              renderMode={VideoRenderMode.Hidden}
-              zOrderMediaOverlay={true}
-            />
-          );
-        })}
-      </ScrollView>
-      <RoomHeader />
-      <Chat />
+      {streamEngine ? (
+        <>
+          <RtcLocalView.SurfaceView
+            style={styles.frame}
+            channelId={channelName}
+            renderMode={VideoRenderMode.Hidden}
+          />
+          <ScrollView style={styles.remoteContainer} horizontal={true}>
+            {peerIds.map(value => (
+              <RtcRemoteView.SurfaceView
+                key={`${channelName}${value}`}
+                style={styles.remote}
+                uid={value}
+                channelId={channelName}
+                renderMode={VideoRenderMode.Hidden}
+                zOrderMediaOverlay={true}
+              />
+            ))}
+          </ScrollView>
+          <RoomHeader />
+          <Chat />
+        </>
+      ) : (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="white" />
+          <Text style={styles.loadingText}>Carregando chat...</Text>
+        </View>
+      )}
     </View>
   );
 };

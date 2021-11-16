@@ -1,32 +1,48 @@
-import React from 'react';
-import { View, TouchableOpacity, Image, FlatList } from 'react-native';
+import React, { useState } from 'react';
+import { View, TouchableOpacity, Text, TextInput } from 'react-native';
 import { styles } from './styles';
-import roomBackground from '../../assets/images/room.png';
 import { useRootStackNavigation } from '../../app.routes';
 
 const Home: React.FC = () => {
   const { navigate } = useRootStackNavigation();
 
+  const [username, setUsername] = useState<string>('');
+  const [errorMessage, setErrorMessage] = useState<string>('');
+
+  const onTextChange = (value: string) => {
+    setErrorMessage('');
+    setUsername(value);
+  };
+
+  const handleJoinDefaultChatRoom = () => {
+    if (username.length > 4) {
+      navigate('ChatRoom', { username });
+    } else {
+      setErrorMessage('O seu username deve ter pelo menos 5 caracteres');
+    }
+  };
+
   return (
-    <View style={styles.max}>
-      <View style={styles.max}>
-        <View style={styles.buttonHolder}>
-          <FlatList
-            data={[1, 2, 3, 4, 5, 6]}
-            numColumns={2}
-            columnWrapperStyle={styles.flatList}
-            keyExtractor={(item, index) => `${item}${index}`}
-            renderItem={() => (
-              <TouchableOpacity
-                onPress={() => navigate('ChatRoom', { userName: 'Joao 123' })}
-                style={styles.button}
-              >
-                <Image source={roomBackground} />
-              </TouchableOpacity>
-            )}
-          />
-        </View>
-      </View>
+    <View style={styles.screen}>
+      <Text style={styles.title}>Stagefy POC</Text>
+
+      <TextInput
+        style={styles.input}
+        placeholder="Seu username"
+        placeholderTextColor="darkgrey"
+        onChangeText={onTextChange}
+      />
+
+      {errorMessage.length > 0 && (
+        <Text style={styles.inputError}>{errorMessage}</Text>
+      )}
+
+      <TouchableOpacity
+        onPress={handleJoinDefaultChatRoom}
+        style={styles.button}
+      >
+        <Text style={styles.buttonText}>Entrar</Text>
+      </TouchableOpacity>
     </View>
   );
 };

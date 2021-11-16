@@ -1,26 +1,44 @@
 import { StyleSheet } from 'react-native';
 
 export const styles = StyleSheet.create({
-  max: {
+  screen: {
     flex: 1,
+    backgroundColor: 'mistyrose',
+    padding: 20,
   },
-  buttonHolder: {
-    height: 100,
-    alignItems: 'center',
-    flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'space-evenly',
+  title: {
+    fontSize: 38,
+    color: 'black',
+    fontWeight: 'bold',
+    marginTop: 30,
+    marginBottom: 'auto',
+    textAlign: 'center',
   },
-  flatList: {
-    flex: 1,
-    justifyContent: 'space-around',
+  input: {
+    color: 'black',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: 'grey',
+    backgroundColor: 'ghostwhite',
+    padding: 10,
+    fontSize: 16,
+  },
+  inputError: {
+    fontSize: 12,
+    color: 'red',
   },
   button: {
+    marginTop: 20,
+    marginBottom: 40,
     paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 25,
+    paddingVertical: 15,
+    borderRadius: 10,
+    backgroundColor: 'royalblue',
   },
   buttonText: {
-    color: '#fff',
+    color: 'white',
+    textAlign: 'center',
+    textTransform: 'uppercase',
+    fontWeight: 'bold',
   },
 });

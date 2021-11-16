@@ -19,6 +19,7 @@ export const styles = StyleSheet.create({
     flex: 1,
     width: dimensions.width,
     height: dimensions.height - 100,
+    backgroundColor: 'black',
   },
   remoteContainer: {
     paddingHorizontal: 2.5,
@@ -37,4 +38,11 @@ export const styles = StyleSheet.create({
     paddingVertical: 5,
     color: '#0093E9',
   },
+  loadingContainer: {
+    marginTop: 'auto',
+    marginBottom: 'auto',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: { marginTop: 20, fontSize: 16 },
 });

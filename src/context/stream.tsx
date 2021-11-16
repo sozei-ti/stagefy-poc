@@ -13,10 +13,11 @@ const AGORA_TOKEN =
 const AGORA_CHANNEL_NAME = 'POC Stagefy';
 
 type StreamContextProps = {
+  streamEngine: RtcEngine | undefined;
   appId: string;
   token: string;
   channelName: string;
-  startCall: () => void;
+  startCall: (username: string) => void;
   endCall: () => void;
   messages: MessageData[];
   peerIds: number[];
@@ -35,22 +36,37 @@ export const StreamContext = createContext<StreamContextProps>(
 export const StreamProvider: React.FC = ({ children }) => {
   const [messages, setMessages] = useState<MessageData[]>([]);
   const [peerIds, setPeerIds] = useState<number[]>([]);
-  const [engine, setEngine] = useState<RtcEngine | undefined>(undefined);
+  const [streamEngine, setStreamEngine] = useState<RtcEngine | undefined>(
+    undefined,
+  );
   const [isMicrophoneOpen, setIsMicrophoneOpen] = useState(true);
   const [isBroadcaster, setIsBroadcaster] = useState(false);
+  const [username, setUsername] = useState('');
 
-  const initializeAgora = async () => {
-    const newEngine = await RtcEngine.create(AGORA_APP_ID);
-    setEngine(newEngine);
-    await newEngine.enableVideo();
-    await newEngine.enableAudio();
-    await newEngine.setChannelProfile(ChannelProfile.LiveBroadcasting);
-    await newEngine.setClientRole(ClientRole.Broadcaster);
-    await newEngine.setCameraAutoFocusFaceModeEnabled(true);
-    await setupListeners(newEngine);
+  const startCall = async (newUsername: string) => {
+    try {
+      const newEngine = await RtcEngine.create(AGORA_APP_ID);
+      await newEngine.enableVideo();
+      await newEngine.enableAudio();
+      await newEngine.setChannelProfile(ChannelProfile.LiveBroadcasting);
+      await newEngine.setClientRole(ClientRole.Broadcaster);
+      await newEngine.setCameraAutoFocusFaceModeEnabled(true);
+      setupListeners(newEngine);
+
+      await newEngine.joinChannelWithUserAccount(
+        AGORA_TOKEN,
+        AGORA_CHANNEL_NAME,
+        `${Math.floor(Math.random() * 100)}${Date.now()}`,
+      );
+
+      setStreamEngine(newEngine);
+      setUsername(newUsername);
+    } catch (error) {
+      console.log('StreamContext - startCall() error:', error);
+    }
   };
 
-  const setupListeners = async (newEngine: RtcEngine) => {
+  const setupListeners = (newEngine: RtcEngine) => {
     newEngine.addListener('UserJoined', (userId, elapsed) => {
       console.log('UserJoined', userId, elapsed);
 
@@ -78,18 +94,22 @@ export const StreamProvider: React.FC = ({ children }) => {
   const toggleBroadcaster = async () => {
     console.log('isBroadcaster', isBroadcaster);
 
-    if (engine) {
-      if (isBroadcaster) {
-        await engine.enableVideo();
-      } else {
-        await engine.disableVideo();
+    if (streamEngine) {
+      try {
+        if (isBroadcaster) {
+          await streamEngine.enableVideo();
+        } else {
+          await streamEngine.disableVideo();
+        }
+
+        await streamEngine.setClientRole(
+          isBroadcaster ? ClientRole.Audience : ClientRole.Broadcaster,
+        );
+
+        setIsBroadcaster(state => !state);
+      } catch (error) {
+        console.log('StreamContext - toggleBroadcaster() error:', error);
       }
-
-      await engine.setClientRole(
-        isBroadcaster ? ClientRole.Audience : ClientRole.Broadcaster,
-      );
-
-      setIsBroadcaster(state => !state);
     } else {
       console.log('toggleBroadcaster: Engine is empty');
     }
@@ -107,7 +127,7 @@ export const StreamProvider: React.FC = ({ children }) => {
       message: message,
       type: MessageType.TextMessage,
       user: {
-        name: 'Teste',
+        name: username,
         avatar_url:
           'http://ibaseminario.com.br/novo/wp-content/uploads/2013/09/default-avatar.png',
       },
@@ -118,54 +138,66 @@ export const StreamProvider: React.FC = ({ children }) => {
   };
 
   const sendTextMessage = async (message: string) => {
-    if (engine) {
+    if (streamEngine) {
       const messageDate = createMessage(message);
-      const streamId = await engine.createDataStreamWithConfig(
-        new DataStreamConfig(true, true),
-      );
 
-      console.log('sendTextMessage streamId', streamId);
+      try {
+        const streamId = await streamEngine.createDataStreamWithConfig(
+          new DataStreamConfig(true, true),
+        );
 
-      await engine.sendStreamMessage(streamId!, messageDate);
+        console.log('sendTextMessage streamId', streamId);
+
+        await streamEngine.sendStreamMessage(streamId!, messageDate);
+      } catch (error) {
+        console.log('StreamContext - sendTextMessage() error:', error);
+      }
     } else {
       console.log('sendTextMessage: Engine is empty');
     }
   };
 
   const endCall = async () => {
-    if (engine) {
-      await engine.leaveChannel();
+    if (streamEngine) {
+      try {
+        console.log('streamEngine before leave:', streamEngine);
+        await streamEngine.leaveChannel();
+        console.log('streamEngine beforeDestroy', streamEngine);
+        await streamEngine.destroy();
+        console.log('streamEngine afterDestroy', streamEngine);
+        setStreamEngine(undefined);
+      } catch (error) {
+        console.log('StreamContext - endCall() error:', error);
+      }
     } else {
       console.log('endCall: Engine is empty');
     }
 
     setPeerIds([]);
-  };
-
-  const startCall = async () => {
-    if (engine) {
-      await engine.joinChannelWithUserAccount(
-        AGORA_TOKEN,
-        AGORA_CHANNEL_NAME,
-        `${Math.floor(Math.random() * 100)}${Date.now()}`,
-      );
-    } else {
-      console.log('startCall: Engine is empty');
-    }
+    setMessages([]);
+    setUsername('');
   };
 
   const toggleCamera = async () => {
-    if (engine) {
-      await engine.switchCamera();
+    if (streamEngine) {
+      try {
+        await streamEngine.switchCamera();
+      } catch (error) {
+        console.log('StreamContext - toggleCamera() error:', error);
+      }
     } else {
       console.log('toggleCamera: Engine is empty');
     }
   };
 
   const toggleMicrophone = async () => {
-    if (engine) {
-      await engine.enableLocalAudio(!isMicrophoneOpen);
-      setIsMicrophoneOpen(state => !state);
+    if (streamEngine) {
+      try {
+        await streamEngine.enableLocalAudio(!isMicrophoneOpen);
+        setIsMicrophoneOpen(state => !state);
+      } catch (error) {
+        console.log('StreamContext - toggleMicrophone() error:', error);
+      }
     } else {
       console.log('toggleMicrophone: Engine is empty');
     }
@@ -173,20 +205,12 @@ export const StreamProvider: React.FC = ({ children }) => {
 
   useEffect(() => {
     requestCameraAndAudioPermission();
-    initializeAgora();
-    return () => {
-      if (engine) {
-        engine.destroy();
-      } else {
-        console.log('useEffect destroy: Engine is empty');
-      }
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
     <StreamContext.Provider
       value={{
+        streamEngine,
         appId: AGORA_APP_ID,
         channelName: AGORA_CHANNEL_NAME,
         token: AGORA_TOKEN,
