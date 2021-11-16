@@ -8,7 +8,8 @@ export const styles = StyleSheet.create({
     width: '100%',
   },
   messagesContainer: {
-    padding: 20,
+    padding: 0,
+    paddingLeft: 10,
     maxHeight: 200,
     backgroundColor: 'rgba(0,0,0,.5)',
   },

@@ -1,23 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { View, TouchableOpacity, Image, FlatList } from 'react-native';
 import { styles } from './styles';
 import roomBackground from '../../assets/images/room.png';
-import { Room } from '../Room';
-import { useStream } from '../../context/stream';
+import { useRootStackNavigation } from '../../app.routes';
 
-export const Home: React.FC = () => {
-  const [redirectToRoom, setRedirectToRoom] = useState(false);
-  const { isJoinSucceed } = useStream();
+const Home: React.FC = () => {
+  const { navigate } = useRootStackNavigation();
 
-  useEffect(() => {
-    if (!isJoinSucceed) {
-      setRedirectToRoom(false);
-    }
-  }, [isJoinSucceed]);
-
-  if (redirectToRoom) {
-    return <Room />;
-  }
   return (
     <View style={styles.max}>
       <View style={styles.max}>
@@ -29,7 +18,7 @@ export const Home: React.FC = () => {
             keyExtractor={(item, index) => `${item}${index}`}
             renderItem={() => (
               <TouchableOpacity
-                onPress={() => setRedirectToRoom(true)}
+                onPress={() => navigate('ChatRoom', { userName: 'Joao 123' })}
                 style={styles.button}
               >
                 <Image source={roomBackground} />
@@ -41,3 +30,5 @@ export const Home: React.FC = () => {
     </View>
   );
 };
+
+export default Home;

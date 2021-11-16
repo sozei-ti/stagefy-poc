@@ -10,7 +10,7 @@ import { RoomHeader } from '../../components/RoomHeader';
 import { useStream } from '../../context/stream';
 import { styles } from './styles';
 
-export const Room: React.FC = () => {
+const ChatRoom: React.FC = () => {
   const { channelName, peerIds, startCall } = useStream();
 
   useEffect(() => {
@@ -24,7 +24,6 @@ export const Room: React.FC = () => {
         channelId={channelName}
         renderMode={VideoRenderMode.Hidden}
       />
-      <Chat />
       <ScrollView style={styles.remoteContainer} horizontal={true}>
         {peerIds.map(value => {
           return (
@@ -40,6 +39,9 @@ export const Room: React.FC = () => {
         })}
       </ScrollView>
       <RoomHeader />
+      <Chat />
     </View>
   );
 };
+
+export default ChatRoom;

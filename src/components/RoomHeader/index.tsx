@@ -12,10 +12,10 @@ export const RoomHeader: React.FC = () => {
   return (
     <>
       <TouchableOpacity style={styles.button} onPress={endCall}>
-        <AntDesignIcon name="closecircle" color="#FFF" size={20} />
+        <AntDesignIcon name="closecircle" color="#FFF" size={25} />
       </TouchableOpacity>
       <TouchableOpacity style={styles.buttonSwitch} onPress={toggleCamera}>
-        <MaterialIconsIcon name="switch-camera" color="#FFF" size={20} />
+        <MaterialIconsIcon name="switch-camera" color="#FFF" size={25} />
       </TouchableOpacity>
     </>
   );
