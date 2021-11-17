@@ -73,11 +73,15 @@ export const StreamProvider: React.FC = ({ children }) => {
   const setupListeners = (newEngine: RtcEngine) => {
     newEngine.addListener('UserJoined', (userId, elapsed) => {
       console.log('UserJoined', userId, elapsed);
-
-      const userIsAlreadyRegistered = peerIds.find(id => id === userId);
-      if (!userIsAlreadyRegistered) {
-        setPeerIds(state => [...state, userId]);
-      }
+      setMessages(state => [...state]);
+      console.log({ peerIds });
+      setPeerIds(state => {
+        if (state.find(item => item === userId)) {
+          return state;
+        } else {
+          return [...state, userId];
+        }
+      });
     });
 
     newEngine.addListener('UserOffline', (userId, elapsed) => {
