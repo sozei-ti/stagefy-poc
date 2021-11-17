@@ -127,7 +127,13 @@ export const StreamProvider: React.FC = ({ children }) => {
   const registerMessage = (message: string) => {
     const messageData = JSON.parse(message) as MessageData;
 
-    setMessages(state => [...state, messageData]);
+    setMessages(state => {
+      if (state.find(item => item === messageData)) {
+        return state;
+      } else {
+        return [...state, messageData];
+      }
+    });
   };
 
   const createMessage = (message: string): string => {
