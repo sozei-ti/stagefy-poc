@@ -10,6 +10,7 @@ import { RootStackPagesList, useRootStackNavigation } from '../../app.routes';
 import { Chat } from '../../components/Chat';
 import { RoomHeader } from '../../components/RoomHeader';
 import { useStream } from '../../context/stream';
+import { randomId } from '../utils/generateRandomId';
 import { styles } from './styles';
 
 const ChatRoom: React.FC = () => {
@@ -46,7 +47,7 @@ const ChatRoom: React.FC = () => {
           <ScrollView style={styles.remoteContainer} horizontal={true}>
             {peerIds.map(value => (
               <RtcRemoteView.SurfaceView
-                key={`${channelName}${value}`}
+                key={`${channelName}${value}${randomId()}`}
                 style={styles.remote}
                 uid={value}
                 channelId={channelName}

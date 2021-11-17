@@ -3,14 +3,16 @@ import RtcEngine, {
   ChannelProfile,
   ClientRole,
   DataStreamConfig,
+  RtcEngineContext,
 } from 'react-native-agora';
 import { MessageData, MessageType } from '../models/message';
+import { randomId } from '../pages/utils/generateRandomId';
 import { requestCameraAndAudioPermission } from '../pages/utils/permissions';
 
 const AGORA_APP_ID = 'e5c64fc6afda478996fc412a4b61aed5';
 const AGORA_TOKEN =
-  '006e5c64fc6afda478996fc412a4b61aed5IAA4PW0w31eaRjYYi1Q72PL6yvUXRg3IT/tO8CvCHprdzjkNSM8AAAAAEAACwxdSnfmPYQEAAQCc+Y9h';
-const AGORA_CHANNEL_NAME = 'POC Stagefy';
+  '006e5c64fc6afda478996fc412a4b61aed5IAAItNZ3Z0+ma8qizS7dYYKch1OqiVHJ4rpfu5Yq6+vMxoXP3sMAAAAAEAAxeNCcy16WYQEAAQDLXpZh';
+const AGORA_CHANNEL_NAME = 'POC_Stagefy';
 
 type StreamContextProps = {
   streamEngine: RtcEngine | undefined;
@@ -45,7 +47,9 @@ export const StreamProvider: React.FC = ({ children }) => {
 
   const startCall = async (newUsername: string) => {
     try {
-      const newEngine = await RtcEngine.create(AGORA_APP_ID);
+      const newEngine = await RtcEngine.createWithContext(
+        new RtcEngineContext(AGORA_APP_ID),
+      );
       await newEngine.enableVideo();
       await newEngine.enableAudio();
       await newEngine.setChannelProfile(ChannelProfile.LiveBroadcasting);
@@ -56,7 +60,7 @@ export const StreamProvider: React.FC = ({ children }) => {
       await newEngine.joinChannelWithUserAccount(
         AGORA_TOKEN,
         AGORA_CHANNEL_NAME,
-        `${Math.floor(Math.random() * 100)}${Date.now()}`,
+        randomId(),
       );
 
       setStreamEngine(newEngine);
@@ -70,7 +74,8 @@ export const StreamProvider: React.FC = ({ children }) => {
     newEngine.addListener('UserJoined', (userId, elapsed) => {
       console.log('UserJoined', userId, elapsed);
 
-      if (peerIds.indexOf(userId) === -1) {
+      const userIsAlreadyRegistered = peerIds.find(id => id === userId);
+      if (!userIsAlreadyRegistered) {
         setPeerIds(state => [...state, userId]);
       }
     });
@@ -123,7 +128,7 @@ export const StreamProvider: React.FC = ({ children }) => {
 
   const createMessage = (message: string): string => {
     const newMessage: MessageData = {
-      id: `${Math.floor(Math.random() * 100)}${Date.now()}`,
+      id: randomId(),
       message,
       type: MessageType.TextMessage,
       user: {
