@@ -55,7 +55,6 @@ export const StreamProvider: React.FC = ({ children }) => {
       await newEngine.setChannelProfile(ChannelProfile.LiveBroadcasting);
       await newEngine.setClientRole(ClientRole.Broadcaster);
       await newEngine.setCameraAutoFocusFaceModeEnabled(true);
-      setupListeners(newEngine);
 
       await newEngine.joinChannelWithUserAccount(
         AGORA_TOKEN,
@@ -74,7 +73,6 @@ export const StreamProvider: React.FC = ({ children }) => {
     newEngine.addListener('UserJoined', (userId, elapsed) => {
       console.log('UserJoined', userId, elapsed);
       setMessages(state => [...state]);
-      console.log({ peerIds });
       setPeerIds(state => {
         if (state.find(item => item === userId)) {
           return state;
@@ -96,7 +94,14 @@ export const StreamProvider: React.FC = ({ children }) => {
 
     newEngine.addListener('StreamMessage', (userId, streamId, data) => {
       console.log('StreamMessage', userId, streamId, data);
-      registerMessage(data);
+      const parsedMessage = JSON.parse(data) as MessageData;
+      if (messages.find(message => message.id === parsedMessage.id)) {
+        console.log('StreamMessage', 'already  exists');
+        return;
+      } else {
+        console.log('StreamMessage', 'new registed');
+        setMessages(state => [...state, parsedMessage]);
+      }
     });
   };
 
@@ -122,18 +127,6 @@ export const StreamProvider: React.FC = ({ children }) => {
     } else {
       console.log('toggleBroadcaster: Engine is empty');
     }
-  };
-
-  const registerMessage = (message: string) => {
-    const messageData = JSON.parse(message) as MessageData;
-
-    setMessages(state => {
-      if (state.find(item => item === messageData)) {
-        return state;
-      } else {
-        return [...state, messageData];
-      }
-    });
   };
 
   const createMessage = (message: string): string => {
@@ -221,6 +214,13 @@ export const StreamProvider: React.FC = ({ children }) => {
   useEffect(() => {
     requestCameraAndAudioPermission();
   }, []);
+
+  useEffect(() => {
+    if (streamEngine) {
+      setupListeners(streamEngine);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [streamEngine]);
 
   return (
     <StreamContext.Provider
